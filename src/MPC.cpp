@@ -2,26 +2,19 @@
 #include <cppad/cppad.hpp>
 #include <cppad/ipopt/solve.hpp>
 #include "Eigen-3.3/Eigen/QR"
-//#include "matplotlibcpp.h"
-
-//namespace plt = matplotlibcpp;
 
 using CppAD::AD;
 
 // We set the number of timesteps to 25
-// and the timestep evaluation frequency or evaluation
-// period to 0.05.
+// and the timestep evaluation frequency or evaluation period to 0.05.
 size_t N = 25;
 double dt = 0.05;
 
 // This value assumes the model presented in the classroom is used.
 //
-// It was obtained by measuring the radius formed by running the vehicle in the
-// simulator around in a circle with a constant steering angle and velocity on a
-// flat terrain.
+// It was obtained by measuring the radius formed by running the vehicle in the simulator around in a circle with a constant steering angle and velocity on a flat terrain.
 //
-// Lf was tuned until the the radius formed by the simulating the model
-// presented in the classroom matched the previous radius.
+// Lf was tuned until the the radius formed by the simulating the model presented in the classroom matched the previous radius.
 //
 // This is the length from front to CoG that has a similar radius.
 const double Lf = 2.67;
@@ -30,9 +23,7 @@ const double Lf = 2.67;
 // The reference velocity is set to 40 mph.
 double ref_v = 40;
 
-// The solver takes all the state variables and actuator
-// variables in a singular vector. Thus, we should to establish
-// when one variable starts and another ends to make our lifes easier.
+// The solver takes all the state variables and actuator variables in a singular vector. Thus, we should to establish when one variable starts and another ends to make our lifes easier.
 size_t x_start = 0;
 size_t y_start = x_start + N;
 size_t psi_start = y_start + N;
@@ -82,8 +73,7 @@ class FG_eval {
 
     // Initial constraints
     //
-    // We add 1 to each of the starting indices due to cost being located at
-    // index 0 of `fg`.
+    // We add 1 to each of the starting indices due to cost being located at index 0 of `fg`.
     // This bumps up the position of all the other values.
     fg[1 + x_start] = vars[x_start];
     fg[1 + y_start] = vars[y_start];
@@ -131,10 +121,8 @@ class FG_eval {
       fg[1 + y_start + t] = y1 - (y0 + v0 * CppAD::sin(psi0) * dt);
       fg[1 + psi_start + t] = psi1 - (psi0 + v0 * delta0 / Lf * dt);
       fg[1 + v_start + t] = v1 - (v0 + a0 * dt);
-      fg[1 + cte_start + t] =
-          cte1 - ((f0 - y0) + (v0 * CppAD::sin(epsi0) * dt));
-      fg[1 + epsi_start + t] =
-          epsi1 - ((psi0 - psides0) + v0 * delta0 / Lf * dt);
+      fg[1 + cte_start + t] = cte1 - ((f0 - y0) + (v0 * CppAD::sin(epsi0) * dt));
+      fg[1 + epsi_start + t] = epsi1 - ((psi0 - psides0) + v0 * delta0 / Lf * dt);
     }
   }
 };

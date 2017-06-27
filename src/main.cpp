@@ -16,39 +16,7 @@ double rad2deg(double x) { return x * 180 / pi(); }
 
 const double Lf = 2;
 
-/**
-// TODO: Implement the global kinematic model.
-// Return the next state.
-//
-// NOTE: state is [x, y, psi, v]
-// NOTE: actuators is [delta, a]
-Eigen::VectorXd globalKinematic(Eigen::VectorXd state, Eigen::VectorXd actuators, double dt) {
-  Eigen::VectorXd next_state(state.size());
-
-  double x = state[0];
-  double y = state[1];
-  double psi = state[2];
-  double v = state[3];
-
-  double delta = actuators[0];
-  double a = actuators[1];
-
-  printf("x=%.4f, y=%.4f, psi=%.4f, v=%.4f, delta=%.4f, a=%.4f\n", x, y, psi, v, delta, a);
-
-  // xt+1=xt+vt∗cos(ψt)∗dt
-  // yt+1=yt+vt∗sin(ψt)∗dt
-  // ψt+1=ψt+Lfvt∗δ∗dt
-  // vt+1=vt+at∗dt
-  double x_1 = x + v * cos(psi) * dt;
-  double y_1 = y + v * sin(psi) * dt;
-  double psi_1 = psi + (v / Lf) * delta * dt;
-  double v_1 = v + a * dt;
-
-  next_state << x_1, y_1, psi_1, v_1;
-  return next_state;
-}
-
-void testGlobalKinematic() {
+void testGlobalKinematic(MPC mpc) {
   // [x, y, psi, v]
   Eigen::VectorXd state(4);
   // [delta, v]
@@ -57,43 +25,12 @@ void testGlobalKinematic() {
   state << 0, 0, deg2rad(45), 1;
   actuators << deg2rad(5), 1;
 
-  Eigen::VectorXd next_state = globalKinematic(state, actuators, 0.3);
+  Eigen::VectorXd next_state = mpc.globalKinematic(state, actuators, 0.3);
 
   std::cout << next_state << std::endl;
 }
 
-// Evaluate a polynomial.
-double polyeval(Eigen::VectorXd coeffs, double x) {
-  double result = 0.0;
-  for (int i = 0; i < coeffs.size(); i++) {
-    result += coeffs[i] * pow(x, i);
-  }
-  return result;
-}
-
-// Fit a polynomial.
-// Adapted from https://github.com/JuliaMath/Polynomials.jl/blob/master/src/Polynomials.jl#L676-L716
-Eigen::VectorXd polyfit(Eigen::VectorXd xvals, Eigen::VectorXd yvals, int order) {
-  assert(xvals.size() == yvals.size());
-  assert(order >= 1 && order <= xvals.size() - 1);
-  Eigen::MatrixXd A(xvals.size(), order + 1);
-
-  for (int i = 0; i < xvals.size(); i++) {
-    A(i, 0) = 1.0;
-  }
-
-  for (int j = 0; j < xvals.size(); j++) {
-    for (int i = 0; i < order; i++) {
-      A(j, i + 1) = A(j, i) * xvals(j);
-    }
-  }
-
-  auto Q = A.householderQr();
-  auto result = Q.solve(yvals);
-  return result;
-}
-
-void testPolyFit() {
+void testPolyFit(MPC mpc) {
   Eigen::VectorXd xvals(6);
   Eigen::VectorXd yvals(6);
   // x waypoint coordinates
@@ -101,19 +38,19 @@ void testPolyFit() {
   // y waypoint coordinates
   yvals << 5.17, -2.25, -15.306, -29.46, -42.85, -57.6116;
 
-  Eigen::VectorXd coeffs = polyfit(xvals, yvals, 3);
+  Eigen::VectorXd coeffs = mpc.polyfit(xvals, yvals, 3);
 
   for (double x = 0; x <= 20; x += 1.0) {
-    std::cout << polyeval(coeffs, x) << std::endl;
+    std::cout << mpc.polyeval(coeffs, x) << std::endl;
   }
 }
-*/
 
 int main() {
-//  testGlobalKinematic();
-//  testPolyFit();
-
   MPC mpc = MPC();
+
+  testGlobalKinematic(mpc);
+  testPolyFit(mpc);
+
   int iters = 50;
 
   Eigen::VectorXd ptsx(2);
