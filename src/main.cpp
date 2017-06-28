@@ -58,8 +58,7 @@ int main() {
   ptsx << -100, 100;
   ptsy << -1, -1;
 
-  // The polynomial is fitted to a straight line so a polynomial with
-  // order 1 is sufficient.
+  // The polynomial is fitted to a straight line so a polynomial with order 1 is sufficient.
   auto coeffs = mpc.polyfit(ptsx, ptsy, 1);
 
   // NOTE: free feel to play around with these
@@ -67,8 +66,7 @@ int main() {
   double y = 10;
   double psi = 0;
   double v = 10;
-  // The cross track error is calculated by evaluating at polynomial at x, f(x)
-  // and subtracting y.
+  // The cross track error is calculated by evaluating at polynomial at x, f(x) and subtracting y.
   double cte = mpc.polyeval(coeffs, x) - y;
   // Due to the sign starting at 0, the orientation error is -f'(x).
   // derivative of coeffs[0] + coeffs[1] * x -> coeffs[1]
